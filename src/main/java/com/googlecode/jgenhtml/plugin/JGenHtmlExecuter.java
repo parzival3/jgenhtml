@@ -74,7 +74,6 @@ public class JGenHtmlExecuter
 
 	/**
 	 *
-	 * @param in The path to an lcovrc config file.
 	 * If not specified will check in user home directory.
 	 */
 	public void setConfig(String config)

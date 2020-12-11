@@ -193,7 +193,6 @@ public class JGenHtmlUtils
 
 	/**
 	 * Writes a resource (e.g. CSS file) to the destination directory.
-	 * @param resourceName The name of a resource (which the classloader can find).
 	 * @param destDir The destination directory.
 	 */
 	protected static void writeResource(final File resource, final File destDir)
@@ -430,9 +429,7 @@ public class JGenHtmlUtils
 	 * @param asXml If true will use the XML output directory, otherwise the HTML directory.
 	 * @param subPath the relative path within the XML/HTML directory.
 	 * @return The directory represented by subPath. If it did not exist it is created.
-	 * @example getTargetDir(tmpDir, true, "foo/bar");
 	 * Would return the directory "bar" within tmpDir/xml.
-	 * @example getTargetDir(tmpDir, false, "foo/bar");
 	 * Would return the directory "bar" within tmpDir/html.
 	 */
 	public static File getTargetDir(final File rootDir, final boolean asXml, final String subPath)
@@ -446,7 +443,6 @@ public class JGenHtmlUtils
 	 * @param rootDir The directory in which to create the subdirectory.
 	 * @param subPath the relative path within the directory.
 	 * @return The directory represented by subPath. If it did not exist it is created.
-	 * @example getTargetDir(tmpDir, "foo/bar");
 	 * Would return the directory "bar" within tmpDir.
 	 */
 	public static File getTargetDir(final File rootDir, final String subPath)

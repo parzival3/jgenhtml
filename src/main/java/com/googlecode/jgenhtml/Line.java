@@ -58,9 +58,6 @@ public class Line extends SourceCode
 		}
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	@Override
 	public Element toXml(final Document document)
 	{

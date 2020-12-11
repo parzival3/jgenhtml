@@ -35,9 +35,6 @@ public class Function extends SourceCode
 		this.name = name;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	@Override
 	public Element toXml(Document document)
 	{
