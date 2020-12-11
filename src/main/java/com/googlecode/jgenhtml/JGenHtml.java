@@ -60,8 +60,7 @@ public class JGenHtml
 				String[] traceFiles = config.getTraceFiles();
 				if(traceFiles.length > 0)
 				{
-					CoverageReport.setConfig(config);
-					CoverageReport coverageReport = new CoverageReport(traceFiles);
+					CoverageReport coverageReport = new CoverageReport(traceFiles, config);
 					if(coverageReport.getPageCount() > 0)
 					{
 						LOGGER.log(Level.INFO, "Found {0} entries.", coverageReport.getPageCount());
