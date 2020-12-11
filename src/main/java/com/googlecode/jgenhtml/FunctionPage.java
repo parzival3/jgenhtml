@@ -47,7 +47,7 @@ public class FunctionPage extends CoveragePage
 	}
 
 	@Override
-	public void writeToFileSystem() throws TransformerConfigurationException, TransformerException, IOException
+	public void writeToFileSystem(Config config) throws TransformerConfigurationException, TransformerException, IOException
 	{
 		Document document = this.getDoc();
 		Element functionsRoot = document.createElement("functions");
@@ -57,7 +57,7 @@ public class FunctionPage extends CoveragePage
 		{
 			functionsRoot.appendChild(func.toXml(document));
 		}
-		super.writeToFileSystem();
+		super.writeToFileSystem(config);
 	}
 
 	Collection<Function> getFunctions()

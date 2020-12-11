@@ -39,7 +39,7 @@ import org.apache.commons.io.LineIterator;
 public final class CoverageReport
 {
 	private static final Logger LOGGER = Logger.getLogger(CoverageReport.class.getName());
-	private static Config config = null;
+	private Config config = null;
 	public static final String DEFAULT_TEST_NAME = "<unnamed>";
 	private String testTitle;
 	private String[] traceFiles;
@@ -58,13 +58,9 @@ public final class CoverageReport
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 */
-	public CoverageReport(final String[] traceFiles) throws IOException, ParserConfigurationException
+	public CoverageReport(final String[] traceFiles, Config config) throws IOException, ParserConfigurationException
 	{
-		if(config == null)
-		{
-			config = new Config();
-		}
-
+    	this.config = config;
 		this.traceFiles = traceFiles;
 		this.descriptionsPage = null;
 		this.indexPages = null;
@@ -164,7 +160,7 @@ public final class CoverageReport
 	{
 		if(descFile != null)
 		{
-			setDescriptionsPage(new DescriptionsPage(testTitle, runTestNames));
+			setDescriptionsPage(new DescriptionsPage(testTitle, runTestNames, config));
 			parseDatFile(descFile, true, false);
 		}
 	}
@@ -258,18 +254,15 @@ public final class CoverageReport
 		}
 	}
 
-	/**
-	 * Write the coverage reports to the file system.
-	 * @param testCaseSourceFiles  The source files we are processing.
-	 */
-	public void generateReports() throws IOException, ParserConfigurationException
+	public float generateReports() throws IOException, ParserConfigurationException
 	{
+		float percentage = 0;
 		try
 		{
 			LOGGER.log(Level.INFO, "Generating output at {0}", config.getOutRootDir().getAbsolutePath());
 			Line.setTabExpand(config.getNumSpaces());
-			generateCoverageReports();
-			generateIndexFiles();
+			generateCoverageReports(config);
+			generateIndexFiles(config);
 			generateResources();
 			generateDescriptionPage();
 			TopLevelIndexPage index = new TopLevelIndexPage(testTitle, indexPages);
@@ -287,7 +280,8 @@ public final class CoverageReport
 				//don't die if there is an exception in logging
 				LOGGER.log(Level.WARNING, t.getLocalizedMessage());
 			}
-			index.writeToFileSystem();
+			percentage = index.getLineRate();
+			index.writeToFileSystem(config);
 		}
 		catch (TransformerConfigurationException ex)
 		{
@@ -297,15 +291,9 @@ public final class CoverageReport
 		{
 			LOGGER.log(Level.SEVERE, ex.getLocalizedMessage());
 		}
+		return percentage;
 	}
 
-	/**
-	 * Log a summary of the coverage information.
-	 * @param prefix The type of coverage: "lines", "functions" or "branches".
-	 * @param rate The coverage rate.
-	 * @param hit The execution count.
-	 * @param count The executable count.
-	 */
 	private static void logSummary(final String type, final float rate, final int hit, final int count)
 	{
 		String prefix = String.format("%1$-11s", type);
@@ -324,14 +312,15 @@ public final class CoverageReport
 	/**
 	 * Generates required resources in the output directory (CSS etc).
 	 */
-	private static void generateResources() throws IOException
+	private void generateResources() throws IOException
 	{
 		File outRootDir = config.getOutRootDir();
 		File docsRootDir;
 
 		if(config.isHtmlOnly())
 		{
-			generateResourcesInDocRoot(outRootDir, false);
+			docsRootDir = JGenHtmlUtils.getTargetDir(outRootDir, false);
+			generateResourcesInDocRoot(docsRootDir, false);
 		}
 		else
 		{
@@ -342,16 +331,16 @@ public final class CoverageReport
 			String ext = config.getHtmlExt();
 			if(Config.DEFAULT_HTML_EXT.equals(ext))
 			{
-				JGenHtmlUtils.writeResource("index.html", outRootDir);
+				JGenHtmlUtils.writeResource("VerilatorCoverage.html", outRootDir);
 			}
 			else
 			{
-				JGenHtmlUtils.writeResource("index.html", outRootDir, Config.DEFAULT_HTML_EXT, ext);
+				JGenHtmlUtils.writeResource("VerilatorCoverage.html", outRootDir, Config.DEFAULT_HTML_EXT, ext);
 			}
 		}
 	}
 
-	private static void generateResourcesInDocRoot(final File docRootDir, final boolean asXml) throws IOException
+	private void generateResourcesInDocRoot(final File docRootDir, final boolean asXml) throws IOException
 	{
 		File cssFile = config.getCssFile();
 		JGenHtmlUtils.writeResource(JGenHtmlUtils.JS_NAME, docRootDir);
@@ -378,36 +367,23 @@ public final class CoverageReport
 		if(this.descriptionsPage != null)
 		{
 			LOGGER.log(Level.INFO, "Writing test case description file.");
-			this.descriptionsPage.writeToFileSystem(config.getOutRootDir(), false);
+			this.descriptionsPage.writeToFileSystem(config.getOutRootDir(), false, config);
 			if(!config.isHtmlOnly())
 			{
-				this.descriptionsPage.writeToFileSystem(config.getOutRootDir(), true);
+				this.descriptionsPage.writeToFileSystem(config.getOutRootDir(), true, config);
 			}
 		}
 	}
 
-	/**
-	 * Generates index pages in output directory.
-	 * @param indexPages The index pages to generate.
-	 * @throws TransformerConfigurationException
-	 * @throws TransformerException
-	 */
-	private void generateIndexFiles() throws TransformerConfigurationException, TransformerException, IOException
+	private void generateIndexFiles(Config config) throws TransformerConfigurationException, TransformerException, IOException
 	{
 		for(TestCaseIndexPage index : indexPages)
 		{
-			index.writeToFileSystem();
+			index.writeToFileSystem(config);
 		}
 	}
 
-	/**
-	 * Generate line coverage report pages in the output directory.
-	 * @param testCaseSourceFiles The test case source files to generate.
-	 * @return Index pages required to reference the coverage reports.
-	 * @throws TransformerConfigurationException
-	 * @throws TransformerException
-	 */
-	private void generateCoverageReports() throws TransformerConfigurationException, TransformerException, IOException, ParserConfigurationException
+	private void generateCoverageReports(Config config) throws TransformerConfigurationException, TransformerException, IOException, ParserConfigurationException
 	{
 		Map<String, TestCaseIndexPage> indeces = new HashMap<String, TestCaseIndexPage>();
 		for(TestCaseSourceFile testCaseSourceFile : parsedFiles.getAll())
@@ -427,15 +403,11 @@ public final class CoverageReport
 			}
 			TestCaseIndexPage indexPage = indeces.get(path);
 			indexPage.addSourceFile(testCaseSourceFile);
-			testCaseSourceFile.writeToFileSystem();
+			testCaseSourceFile.writeToFileSystem(config);
 		}
 		indexPages = indeces.values();
 	}
 
-	/**
-	 * For the list of source files, iterate over each of them and remove the prefix if appropriate.
-	 * @param testCaseSourceFiles The list of source files.
-	 */
 	public void removePrefix()
 	{
 		Collection<TestCaseSourceFile> testCaseSourceFiles = parsedFiles.getAll();
@@ -460,7 +432,7 @@ public final class CoverageReport
 	 * @param testCaseSourceFiles The source files we are processing.
 	 * @return The prefix to remove or null (if the user specified not to remove prefixes).
 	 */
-	private static String getPrefix(final Collection<TestCaseSourceFile> testCaseSourceFiles)
+	private String getPrefix(final Collection<TestCaseSourceFile> testCaseSourceFiles)
 	{
 		String result;
 		if(config.isNoPrefix())
@@ -485,15 +457,5 @@ public final class CoverageReport
 			LOGGER.log(Level.INFO, "Using user-specified filename prefix \"{0}\'", result);
 		}
 		return result;
-	}
-
-	public static void setConfig(Config config)
-	{
-		CoverageReport.config = config;
-	}
-
-	public static Config getConfig()
-	{
-		return config;
 	}
 }

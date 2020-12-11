@@ -42,14 +42,14 @@ public class DescriptionsPage
 	private Set<String> runTests;
 	private boolean ignoreDescriptions;
 
-	public DescriptionsPage(final String testName, Set<String> runTests) throws ParserConfigurationException
+	public DescriptionsPage(final String testName, Set<String> runTests, Config config) throws ParserConfigurationException
 	{
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder;
 		docBuilder = dbfac.newDocumentBuilder();
 		this.doc = docBuilder.newDocument();
 		descriptions = doc.createElement("descriptions");
-		if(CoverageReport.getConfig().isKeepDescriptions())
+		if(config.isKeepDescriptions())
 		{
 			this.runTests = null;
 		}
@@ -62,10 +62,6 @@ public class DescriptionsPage
 		JGenHtmlUtils.setGlobalRootAttributes(descriptions, testName);
 	}
 
-	/**
-	 * Add more description information.
-	 * @param line a line from the description file.
-	 */
 	public void addLine(final String lineToAdd)
 	{
 		String line = lineToAdd.trim();
@@ -105,10 +101,9 @@ public class DescriptionsPage
 	 * @throws TransformerConfigurationException
 	 * @throws TransformerException
 	 */
-	public void writeToFileSystem(final File rootDir, final boolean asXml) throws TransformerConfigurationException, TransformerException, IOException
+	public void writeToFileSystem(final File rootDir, final boolean asXml, Config config) throws TransformerConfigurationException, TransformerException, IOException
 	{
 		String tagetFileName = "descriptions";
-		Config config = CoverageReport.getConfig();
 		File outDir = config.isHtmlOnly()? JGenHtmlUtils.getTargetDir(rootDir, "") : JGenHtmlUtils.getTargetDir(rootDir, asXml);
 		File out;
 		if(asXml)
@@ -120,6 +115,6 @@ public class DescriptionsPage
 		{
 			out = new File(outDir, tagetFileName + config.getHtmlExt());
 		}
-		JGenHtmlUtils.transformToFile(out, asXml, doc);
+		JGenHtmlUtils.transformToFile(out, asXml, doc, config);
 	}
 }

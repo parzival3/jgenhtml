@@ -35,7 +35,7 @@ public abstract class CoverageIndexPage extends CoveragePage
 	 */
 	public CoverageIndexPage(final String testName) throws ParserConfigurationException
 	{
-		super(testName, "index");
+		super(testName, "VerilatorCoverage");
 		Document doc = this.getDoc();
 		this.sources = doc.createElement("sources");
 		Element root = doc.getDocumentElement();

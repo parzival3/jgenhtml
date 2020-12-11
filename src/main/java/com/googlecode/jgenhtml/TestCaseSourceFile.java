@@ -189,13 +189,13 @@ public class TestCaseSourceFile extends CoveragePage
 	}
 
 	@Override
-	public void writeToFileSystem() throws TransformerConfigurationException, TransformerException, IOException
+	public void writeToFileSystem(Config config) throws TransformerConfigurationException, TransformerException, IOException
 	{
 		Document document = this.getDoc();
 		Element lines = document.createElement("lines");
 		Element root = document.getDocumentElement();
 		root.appendChild(lines);
-		if(!CoverageReport.getConfig().isNoSource())
+		if(!config.isNoSource())
 		{
 			int prevLineNo = 0;
 			for(Line line : lineItems.values())
@@ -215,10 +215,10 @@ public class TestCaseSourceFile extends CoveragePage
 				Element lineElement = line.toXml(document);
 				lines.appendChild(lineElement);
 			}
-			super.writeToFileSystem();
+			super.writeToFileSystem(config);
 			if(this.functionPage.getFuncCount() > 0)
 			{
-				this.functionPage.writeToFileSystem();
+				this.functionPage.writeToFileSystem(config);
 			}
 		}
 	}

@@ -67,7 +67,7 @@ public class JGenHtmlUtils
 	{
 		root.setAttribute("testname", testName);
 		root.setAttribute("date", getDate());
-		root.setAttribute("version", JGenHtml.VERSION);
+		root.setAttribute("version", "1.5");
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class JGenHtmlUtils
 	 */
 	protected static void writeResource(final String resourceName, final File destDir, String token, String substitute)
 	{
-		InputStream in = JGenHtml.class.getResourceAsStream('/' + resourceName);
+		InputStream in = JGenHtmlUtils.class.getResourceAsStream('/' + resourceName);
 		writeStreamToFileAndReplace(in, new File(destDir, resourceName), token, substitute);
 	}
 
@@ -315,10 +315,9 @@ public class JGenHtmlUtils
 		return result;
 	}
 
-	public static void transformToFile(final File targetFile, final boolean asXml, final Document doc) throws TransformerConfigurationException, TransformerException, IOException
+	public static void transformToFile(final File targetFile, final boolean asXml, final Document doc, Config config) throws TransformerConfigurationException, TransformerException, IOException
 	{
 		Transformer transformer;
-		Config config = CoverageReport.getConfig();
 		if(asXml)
 		{
 			transformer = getTransformer(null);

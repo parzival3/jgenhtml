@@ -450,10 +450,6 @@ public final class Config
 		}
 	}
 
-	/**
-	 * Displays help message to user.
-	 * @param options CommandLine options.
-	 */
 	public void showCmdLineHelp()
 	{
 		HelpFormatter formatter = new HelpFormatter();
@@ -685,7 +681,7 @@ public final class Config
 	 * Turn function coverage reporting on or off.
 	 * @param functionCoverage
 	 */
-	private void setFunctionCoverage(final boolean functionCoverage)
+	public void setFunctionCoverage(final boolean functionCoverage)
 	{
 		this.functionCoverage = functionCoverage;
 	}
@@ -703,7 +699,7 @@ public final class Config
 	 * Turn branch coverage reporting on or off.
 	 * @param branchCoverage
 	 */
-	private void setBranchCoverage(final boolean branchCoverage)
+	public void setBranchCoverage(final boolean branchCoverage)
 	{
 		this.branchCoverage = branchCoverage;
 	}
@@ -716,10 +712,6 @@ public final class Config
 		return outRootDir;
 	}
 
-	/**
-	 * Sets the output directory where all the output will be generated.
-	 * @param outputDir The path to the desired output directory.
-	 */
 	private void setOutRootDir(final String outRootDir)
 	{
 		File file = new File(outRootDir);
@@ -770,10 +762,6 @@ public final class Config
 		this.legend = legend;
 	}
 
-	/**
-	 * Get the override CSS file.
-	 * @param cssPath The override CSS file if it has been set, otherwise null.
-	 */
 	public File getCssFile()
 	{
 		return cssFile;
@@ -849,10 +837,6 @@ public final class Config
 		}
 	}
 
-	/**
-	 * Set the user preference for expanding tab characters to spaces in source code view.
-	 * @param numSpaces The number of spaces tabs will be expanded to.
-	 */
 	private void setNumSpaces(final int numspaces)
 	{
 		if(numspaces >= 0)//is zero too low?
@@ -929,6 +913,10 @@ public final class Config
 		return quiet;
 	}
 
+	public void setQuiet(boolean value) {
+		quiet = value;
+	}
+
 	/**
 	 * Determine if we are producing HTML report only (ie exclude XML version).
 	 * @return true if producing html version only.
@@ -942,7 +930,7 @@ public final class Config
 	 * Set user preference for producing HTML report only (ie exclude XML version).
 	 * @param htmlOnly true to produce html version only.
 	 */
-	private void setHtmlOnly(boolean htmlOnly)
+	public void setHtmlOnly(boolean htmlOnly)
 	{
 		this.htmlOnly = htmlOnly;
 	}

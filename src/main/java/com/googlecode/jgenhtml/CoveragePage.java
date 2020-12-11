@@ -241,19 +241,17 @@ public abstract class CoveragePage
 
 	/**
 	 * Writes this coverage page to the file system as XML/HTML.
-	 * @param rootDir The output directory.
 	 * @throws TransformerConfigurationException
 	 * @throws TransformerException
 	 */
-	public void writeToFileSystem() throws TransformerConfigurationException, TransformerException, IOException
+	public void writeToFileSystem(Config config) throws TransformerConfigurationException, TransformerException, IOException
 	{
 		updateCoverageAttributes();
-		Config config = CoverageReport.getConfig();
 		doc.getDocumentElement().appendChild(config.toXml(doc));
-		writeToFileSystem(config.getOutRootDir(), false);
+		writeToFileSystem(config.getOutRootDir(), false, config);
 		if(!config.isHtmlOnly())
 		{
-			writeToFileSystem(config.getOutRootDir(), true);
+			writeToFileSystem(config.getOutRootDir(), true, config);
 		}
 	}
 
@@ -307,9 +305,8 @@ public abstract class CoveragePage
 	 * @throws TransformerConfigurationException
 	 * @throws TransformerException
 	 */
-	private void writeToFileSystem(final File rootDir, final boolean asXml) throws TransformerConfigurationException, TransformerException, IOException
+	private void writeToFileSystem(final File rootDir, final boolean asXml, Config config) throws TransformerConfigurationException, TransformerException, IOException
 	{
-		Config config = CoverageReport.getConfig();
 		String tagetFileName = pageName;
 		if(this instanceof FunctionPage)
 		{
@@ -338,7 +335,7 @@ public abstract class CoveragePage
 			out = new File(outDir, tagetFileName + config.getHtmlExt());
 		}
 		LOGGER.log(Level.FINE, "Writing file: {0}", out.getAbsolutePath());
-		JGenHtmlUtils.transformToFile(out, asXml, doc);
+		JGenHtmlUtils.transformToFile(out, asXml, doc, config);
 	}
 
 	private static String calculateRelativePathToRoot(final String path)
